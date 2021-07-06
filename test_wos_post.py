@@ -1,12 +1,9 @@
 # -*- coding = utf-8 -*-
-# @Time : 2021/7/4 10:38
-# @Author : ChuanYu
-# @File : testUrllib.py
-# @Software PyCharm
+
 
 import requests
 import re
-from bs4 import BeautifulSoup
+
 
 url = "http://apps.webofknowledge.com/full_record.do?product=WOS&search_mode=GeneralSearch&qid=1&SID=D35u57dAGH7fDjXW1Sy&page=1&doc=1"
 headers = {
@@ -25,34 +22,18 @@ params = {
             "search_mode": "GeneralSearch",
             "prID": "24c13da7-2dd2-43cf-af16-0954e2ec2c1e"}
 
-req = requests.get(url, headers=headers, params=params)
-html = req.text
-bs = BeautifulSoup(html, "html.parser")
-# 获取文章标题
-findTitle = re.compile(r'<input type="hidden" name="00N70000002BdnX" value="(.*?)"/>')
-a = re.findall(findTitle, html)
-title = a[0]
-print("标题：", title)
-# 获取文章作者
-findAuthor = re.compile(r'alt="查找此作者的更多记录">(.*?)</a>(.*?)<sup><b>')
-b = re.findall(findAuthor, html)
-i = 0
-author = ""
-for j in b:
-    author += j[0]
-    author += j[1]
-    i += 1
-    if i==len(b):
-        continue
-    author += ','
-print("作者：", author)
-# 获取文章摘要
-findAbstract = re.compile(r'<p class="FR_field">(.*?)</p>')
-c = re.findall(findAbstract, html)
-abstract = c[0]
-print("摘要：", abstract)
-f = open(r'C:\Users\蒋川宇\Desktop\123.txt', 'w')
-print(title, file=f)
-print(author, file=f)
-print(abstract, file=f)
-f.close()
+
+
+import wos_advanced_query_spider as wosad
+
+
+if __name__ == "__main__":
+    adspdier = wosad.WosAdvancedQuerySpider()
+    adspdier.sendPostReq()
+    pass
+
+
+
+
+
+
