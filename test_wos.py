@@ -18,12 +18,18 @@ class TestWos(unittest.TestCase):
         spider.doSpider()
 
 
-
+    def test_clean(self):
+        spider = wosad.WosAdvancedQuerySpider()
+        spider.sendPostToCleanHistory()
 
     def test_storePapers(self):
         spider = wosad.WosAdvancedQuerySpider()
-        test_url = "https://apps.webofknowledge.com/full_record.do?locale=en_US&errorKey=&search_mode=AdvancedSearch&qid=38&log_event=no&log_event=yes&product=UA&colName=DIIDW&SID=5BxdZewZT5RVCdTpvsG&recordID=202124406N&viewType=fullRecord&doc=1&page=1"
-        spider.storePapers(test_url,1)
+        ##test_url = "https://apps.webofknowledge.com/full_record.do?product=UA&search_mode=AdvancedSearch&qid=1&SID=D4VOxBVl2qs1d5Cl2sI&page=1&doc=1&cacheurlFromRightClick=no"
+        ##test_url = "https://apps.webofknowledge.com/full_record.do?product=UA&search_mode=AdvancedSearch&qid=17&SID=D4VOxBVl2qs1d5Cl2sI&page=1&doc=1&cacheurlFromRightClick=no"
+        test_url = "https://apps.webofknowledge.com/full_record.do?product=UA&search_mode=AdvancedSearch&qid=83&SID=7CPPuWtCsANgjCWAltd&page=1&doc=2&locale=en_US"
+
+
+        spider.storePapers ( "Antigone antigone",  [test_url],  True  )
 
 
 

@@ -14,10 +14,12 @@ from threading import Thread
 import threading
 from random import randint
 import itertools
+import traceback
 """
 用wos高级检索，用TS=""检索关键字 
 
 """
+
 
 
 class AtomicInteger():
@@ -38,9 +40,9 @@ class AtomicInteger():
 class WosAdvancedQuerySpider():
     ##url = "http://apps.webofknowledge.com/Search.do?product=UA&SID=E2vkMLiOafta1P4IqfG&search_mode=GeneralSearch&prID=2b9c5e49-0594-4052-a2a2-d7f3f4be2954"
 
-    SID= "5BxdZewZT5RVCdTpvsG"
+    SID= "E2otS6St8wOZpdbUMN9"
 
-    HOST = "https://apps.webofknowledge.com/"
+    HOST = "http://apps.webofknowledge.com/"
     SEARCH_PREFIX = "TS="
 
     PARTIAL_SUBFIX = """AND (“Artificial intelligence” OR decision* OR multipurpose OR coordination OR algorithm OR UAV OR bionics* OR *model OR *robotics)  
@@ -48,45 +50,34 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
 """
 
     TOPIC_FILE = "./topic"
-    COOKIE = 'SHIB_FED="ChineseFederation"; SHIB_IDP="https://idp.hust.edu.cn/idp/shibboleth"; SHIB_ID="Sh_Huazhong"; _gcl_au=1.1.638956658.1625455080; _hjid=93aa5ca8-6125-4818-88f0-5b159488e325; bm_sz=845B0B9D74950A9E19B7D291D14474F9~YAAQrHJCF1z4pDh6AQAAK4EGfwy91/M4/5gJCs+ghirY/4XIyvFl5GZ/UCw9r2FIdSk/6b+NRU4vUMh+y9nq/7wQn/dF2uSOHy60Yd2iJRqty3nFb9yzeuMAMn38RcAsDU8uoptum42WhhGtEe375HJCt3h5hKA9yimdMSd5rmL7t2JAZNQlXurgqxW9DgCwZWvttk0y0Jc=; _abck=F8FAA2BD22E12EB22F635A5B4DFAC4E4~0~YAAQrHJCF134pDh6AQAAK4EGfwY1A4ugiVqezY284wYjCPgAEFV+pqjLRlDxWHDHAT+UE6m37vGcaBehVY7lJBYJ2SBUbfi+0Y/P09wVOw1Vxbg5PCTa781VMfvsgOqb9162Mw93CcjcFumdkRIU9Pz/O1Pi0hFYCZxob+PPtbl/0hFIVFRyXEl4q8p7tAxppIIOIMPobSNe2X9vyGZAdmCoOuI4WxLL/DEyd6SQosjJIX59dAigPXXhzf3D1GuOBInAy2RHaPfOtyB62QFsa9NSuCGlUh8aKGz+lV0J2U6xNms4crqaWu+BuQK5ftaX2W7qb9RwoXnwJ69FrCPQi6VICdyKarOeD+Ncp8XALnALWmuRGS8j7/1AWwel2aBoNngr3XD0JuMk7voIURk73hB/r+x6yq24TXO1Hw0UKjc=~-1~-1~-1; SID="5BxdZewZT5RVCdTpvsG"; CUSTOMER="Huazhong University of Science and Technology"; E_GROUP_NAME="Huazhong University of Science and Technology"; dotmatics.elementalKey=SLsLWlMhrHnTjDerSrlG; _hjTLDTest=1; _hjAbsoluteSessionInProgress=0; _sp_ses.630e=*; _sp_id.630e=128eac1b-02d6-4a1f-b42b-6c956dc196db.1625455024.8.1625628785.1625556301.d65fcba4-9abd-4f83-82c5-49a642d1d684; _hjDonePolls=708078; JSESSIONID=FA38CFD8E6B8FBF1DA69F36513A62C94; bm_sv=ACA15D9360CFFB33B7455AD72959E3E2~1USpehMBfMhto+yBDpLBkJOFMUW/dJsmKebXTdzkM5xA18+hmeUyGBE3PhNYuXwM9akYrxuHBsbMM6GP3Gi78oRc0h6M5wTvFPbIFzCCbp6NmNr508FmEoVWr3CrN7xtNzqr3ZIzpnh9NPyScf9FqBjjKuE5ougXlsJUu6Kv6L0=; ak_bmsc=820F4689FD2AFCB6403261F38900838A~000000000000000000000000000000~YAAQrHJCF834pDh6AQAABREHfwzgkSkheKd8FICsmQ0Uy7cekgHrB5hrUpQdVr9INl/MQF6IGz7Nb0Su6bVDCImcj8z5x7t+otIrfoG2QzoaPVRUJ51FCSBz5tipV8ww+g2lx69C3phTMkNx0x5WiT/h1xC/sUPNhMtuh8RcXfy+vxSng7hv6xfVb4KXG6cXrK0tJZMvMAWawAEGUf7el9E1FkBXtMrVjJssIN61Gq9M+4MXsOHn8qzU18Bmtm9Acf1oYVDTWz5t+uOdDW4GEEqUhBb+b684PTzIsxz5Ki25/f+tfa3ip/2te7LFE0pNvzromV9kGZfmc7Np3GtVRxh4G/igVLXxjkneBneDn/8DFK8wYhpa4nFWWIDvY1P/L7Yrul10E5RG2vC9wojIyzuAc4N24P2/E0L/yPsPO74=; RT="z=1&dm=webofknowledge.com&si=a899bdad-e314-4764-a1c6-e0dddef7824b&ss=kqsxe7w2&sl=3&tt=aqz&bcn=//b855d7f6.akstat.io/&ld=f6l&nu=50ozr6tu&cl=w42&ul=w4b"'
+    COOKIE = 'SHIB_FED="ChineseFederation"; SHIB_IDP="http://idp.hust.edu.cn/idp/shibboleth"; SHIB_ID="Sh_Huazhong"; _gcl_au=1.1.638956658.1625455080; _hjid=93aa5ca8-6125-4818-88f0-5b159488e325; _hjDonePolls=708078; ak_bmsc=7D15CF40E7786AA7A838847D2E2D66AF~000000000000000000000000000000~YAAQdwpM2z7F1YN6AQAADFjliwwEi9kBZKAyEhaNqXJ2r0Js7r9zOK02Y8k33ITs3R4UkMQh69qyY7MjGthTeCIB01dWWs+uuAP25GbtFnK4OLVU/FCbSDlIyJWBsBpv6CkGaSZMl5taQleYyA2/TXGJDh7+qry4dwCrColClcBjkPWfVKs0y8L6iNE5g/k0pvx1xoZNTrMpHZUTDRo7+f1yW4amBGxYNOFRUXtZ/UFpRUQgjdO4iMvUL5w/pljqOeLYfWrQKr/pp4XxAqxjS3pnPH60CWJuKGgaUAh9Erwwm6mj+NHa/Xv71x6nK52QULnYLieTjgYyIdjjTsoj+cWdTbcGm3OTuUN0J3vnnadd0ME5gBGkDd1utdegCDPjCz6SLoVtbpH/dVX9u/+Egg==; _sp_ses.630e=*; _hjAbsoluteSessionInProgress=1; SID="E2otS6St8wOZpdbUMN9"; CUSTOMER="Huazhong University of Science and Technology"; E_GROUP_NAME="Huazhong University of Science and Technology"; bm_sz=55F228B01C845879F468C6DCFE559A14~YAAQlhTGy2yg5/t5AQAAJlcojAzHHa2CUVX6U4KpFGjqxahqBKP71PEANpmZ0KPrcS1LZT+n7JOEVgobsBuXVWcRRldH2+hYFCwAmnq2jyxb0pbKOdxeOeQXTCIiClK1CtDQTVyk4nifPznMqU+264jj8tmczzYiCtencXG6/SB2BhZlJj3A/tThJQHR6y+HOsqPQmJoG9k=; dotmatics.elementalKey=SLsLWlMhrHnTjDerSrlG; _hjTLDTest=1; _abck=7C24859D970674C11810A64112158E2E~0~YAAQlhTGy3Kg5/t5AQAA8BopjAYeN9Owg1u4d+BC9iYCAorOM8E5Ch0g1Rmvw6KnoMkbTdwsQPtOR/bL1zzdnG7g6lqUFfgLfXC3ONgnC0xkTBHXeWk29x9S8MafbY9A7kzmcmBi8ZmPrEMd+6oBXzDwcPE5EZGtmK3/kBk2WbzyBxYipful42fMgnwxzSAT4KRnA/YLxiY13OUGLrMsgV6KIGm3l+Zi6GSqZpdsdyPVdS519s6taATzkRLvLqBfJnv+jw8lZi7418acvOEJ6b5zftgcyXCr5KVlcbKKcEMIn/f5EQ11zOzMw7ztVbBRiKl7QzsVaXqWTG3vDr86SqnJVjpjMDIDjicuOpM4pVnIQ10y5BAHTn+t/8MU3tpFgW2hlGt7DTdXeuRxw2xNqfi6YvJ1iqlm5JRlJohsf2g=~-1~-1~-1; _sp_id.630e=c01f36c1-106f-4374-866a-da964ba6b3c7.1625844736.1.1625849142.1625844736.01a0e151-0cb2-4090-ace3-e457ff3b4d38; JSESSIONID=3ED14358ECEB92C6E890C6842F30D445; bm_sv=CC34B22ADA326B59B2EE3132DF9302F1~ZCEI7m9q7S0zxI2KZ6Vtt4Ta+jHQtwyZkSv7XneoLzIysFORAx7UeQbnAk/I4RinjZ207V3YDCXkKtSmy5oAo0+CcKgG91a1d4/KbvnwevXWh1iyfesOuj0Zm4q0oLvUIbr3ZOkO7d1E8p8jVP3pPDhlcTs5MKiykHfwmZ4FugY=; RT="z=1&dm=webofknowledge.com&si=d2bdffb0-f500-4f80-bb7b-856089faf7b1&ss=kqwfthto&sl=r&tt=89we&bcn=//684d0d38.akstat.io/&obo=8&nu=1iq64c1es&cl=4s640&ld=4s649&r=9bjbpnzc&ul=4s64a"'
+    SHEET_HEADER_NAMES = ['生物名', '论文', '作者', '摘要', '出版日期', '期刊会议名称', '相关程度（1-5）']
     HEADER = {
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
         "Accept-Encoding": "gzip, deflate",
         "Accept-Language": "zh-CN,zh;q=0.9",
         "Cache-Control": "max-age=0",
         "Connection": "keep-alive",
-        "Cookie": COOKIE[0],
+        "Cookie": COOKIE,
         "Host": "apps.webofknowledge.com",
         "Upgrade-Insecure-Requests": "1",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36"}
-
-    params = {
-        "product": "UA",
-        "SID": SID,
-        "search_mode": "GeneralSearch",
-        ## "prID": "2b9c5e49-0594-4052-a2a2-d7f3f4be2954"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     }
 
 
+    THRESHOLD = 150
+    WORKER_NUM = 5
 
 
-
-
-
-    ##return (bio_name + ' AND (swarm OR "collective behavior")')
-
-    def getBioName(self,str):
-        return str.split("AND")[0].strip()
 
     def completeFilter(self, str):
-        bio_name = self.getBioName(str)
-        str = "TS = (" + bio_name + "AND (collective* AND decision*) " + ")"
+        bio_name = str.strip()
+        str = "TS = (" + bio_name + " AND (collective* AND decision*) " + ")"
         return str
 
-
     def partialFilter(self, str):
-        bio_name = self.getBioName(str)
-        str = "TS = (" + bio_name + "AND (swarm* OR collective*)"  + self.PARTIAL_SUBFIX  + ")"
+        bio_name = str.strip()
+        str = "TS = (" + bio_name + " AND (swarm* OR collective*)"  + self.PARTIAL_SUBFIX  + ")"
         return str
 
 
@@ -96,78 +87,81 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
             content = f.readlines()
 
 
+        topics = []
+        content = [ x.strip() for x in content ]
         if isWeak == False:
-            content = [  self.completeFilter( x.strip() ) for x in content  ]
+            topics = [  self.completeFilter( x.strip() ) for x in content  ]
         if isWeak == True:
-            content = [  self.partialFilter( x.strip() ) for x in content  ]
+            topics = [  self.partialFilter( x.strip() ) for x in content  ]
 
-        return content
+        return [content, topics]
 
 
 
 
     def sendPost(self, topic_keyword):
 
-        POST_URL = "https://apps.webofknowledge.com/UA_AdvancedSearch.do"
+        POST_URL = "http://apps.webofknowledge.com/UA_AdvancedSearch.do"
         POST_PARA = {
-            "product": "UA",
-            "search_mode": "AdvancedSearch",
-            "SID": WosAdvancedQuerySpider.SID,
-            "input_invalid_notice": "Search Error: Please enter a search term.",
-            "input_invalid_notice_limits": " <br/>Note: Fields displayed in scrolling boxes must be combined with at least one other search field.",
-            "action": "search",
-            "replaceSetId": "",
-            "goToPageLoc": "SearchHistoryTableBanner",
-            "value(input1)": topic_keyword,    ##  topic as keyword
-            "value(searchOp)": "search",
-            "limitStatus": "collapsed",
-            "ss_lemmatization": "On",
-            "ss_spellchecking": "Suggest",
-            "SinceLastVisit_UTC": "",
-            "SinceLastVisit_DATE": "",
-            "period": "Range Selection",
-            "range": "ALL",
-            "startYear": "1950",
-            "endYear": "2021",
-            "editions": [
-                "WOS.CCR",
-                "WOS.SCI",
-                "WOS.ESCI",
-                "WOS.SSCI",
-                "WOS.ISSHP",
-                "WOS.ISTP",
-                "WOS.IC",
-                "WOS.AHCI",
-                "BCI.BCI",
-                "CSCD.CSCD",
-                "DIIDW.EDerwent",
-                "DIIDW.MDerwent",
-                "DIIDW.CDerwent",
-                "KJD.KJD",
-                "MEDLINE.MEDLINE",
-                "RSCI.RSCI",
-                "SCIELO.SCIELO"
-            ],
-            "collections": [
-                "WOS",
-                "BCI",
-                "CSCD",
-                "DIIDW",
-                "KJD",
-                "MEDLINE",
-                "RSCI",
-                "SCIELO"
-            ],
-            "update_back2search_link_param": "yes",
-            "ssStatus": "display:none",
-            "ss_showsuggestions": "ON",
-            "ss_query_language": "auto",
-            "rs_sort_by": "PY.D;LD.D;SO.A;VL.D;PG.A;AU.A"
+          "product":"UA",
+          "search_mode":"AdvancedSearch",
+          "SID" : WosAdvancedQuerySpider.SID,
+          "input_invalid_notice":"Search Error: Please enter a search term.",
+          "input_invalid_notice_limits":" <br/>Note: Fields displayed in scrolling boxes must be combined with at least one other search field.",
+          "action":"search",
+          "replaceSetId":"",
+          "goToPageLoc":"SearchHistoryTableBanner",
+          "value(input1)": topic_keyword,
+          "value(searchOp)":"search",
+          "limitStatus":"collapsed",
+          "ss_lemmatization":"On",
+          "ss_spellchecking":"Suggest",
+          "SinceLastVisit_UTC":"",
+          "SinceLastVisit_DATE":"",
+          "period":"Range Selection",
+          "range":"ALL",
+          "startYear":"1950",
+          "endYear":"2021",
+          "editions":[
+            "WOS.CCR",
+            "WOS.SCI",
+            "WOS.ESCI",
+            "WOS.SSCI",
+            "WOS.ISSHP",
+            "WOS.ISTP",
+            "WOS.IC",
+            "WOS.AHCI",
+            "BCI.BCI",
+            "CSCD.CSCD",
+            "DIIDW.EDerwent",
+            "DIIDW.MDerwent",
+            "DIIDW.CDerwent",
+            "KJD.KJD",
+            "MEDLINE.MEDLINE",
+            "RSCI.RSCI",
+            "SCIELO.SCIELO"
+          ],
+          "collections":[
+            "WOS",
+            "BCI",
+            "CSCD",
+            "DIIDW",
+            "KJD",
+            "MEDLINE",
+            "RSCI",
+            "SCIELO"
+          ],
+          "update_back2search_link_param":"yes",
+          "ssStatus":"display:none",
+          "ss_showsuggestions":"ON",
+          "ss_query_language":"auto",
+          "rs_sort_by":"PY.D;LD.D;SO.A;VL.D;PG.A;AU.A"
         }
 
 
+
         logging.info(str(threading.get_ident()) + " prepare to send post request")
-        time.sleep(randint(1000, 3000) * 0.001)
+        time.sleep(randint(2000, 3000) * 0.001)
 
 
         self.postLock.acquire()
@@ -179,12 +173,12 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
         status_code = req.status_code
         if status_code != 200:
             ## error handler
-            logging.warn(str(threading.get_ident())+"  post request status_code is not 200, code is " + status_code)
-            pass
+            logging.warn(str(threading.get_ident())+"  post request status_code is not 200, code is " + str(status_code))
+            return
         html = ""
         html = req.text
         ## this response contains search history tab
-        ## tab [href == https://apps.webofknowledge.com/summary.do]
+        ## tab [href == http://apps.webofknowledge.com/summary.do]
         ## summary.do 即改关键词的论文list的 url
         return html
 
@@ -228,7 +222,7 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
     def doSpider(self):
         self.putTaskInCache()
 
-        NumWorks =6
+        NumWorks = self.WORKER_NUM
         for i in range(NumWorks):
             try:
                 t= Thread(target=self.taskHandler )
@@ -238,7 +232,7 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
 
 
         while self.pending_task.empty() is False:
-            logging.info("in main, the current queue status : size = " + str( self.pending_task.qsize()  ))
+            logging.info("in main, the current queue status : size = " + str( self.pending_task.qsize()  ) + " workers num : " +str( threading.active_count())  )
             time.sleep(7)
 
         self.isRunning = False
@@ -265,18 +259,46 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
 
     class Task:
 
-        def __init__(self,  topic, isWeak, idx):
+        def __init__(self,  topic, isWeak, bioName):
             self.topic = topic
             self.isWeak = isWeak
-            self.idx = idx
-            self.bioName = self.getBioName(topic)
+            self.bioName = bioName
 
 
-        def getBioName(self,str):
-            str = str.split("AND")[0].strip()
-            str = str.split("(")[1].strip()
-            str = str[1:-1]
-            return str
+
+    def sendPostToCleanHistory(self):
+        POST_URL = "http://apps.webofknowledge.com/UA_CombineSearches.do"
+        remove_item = []
+        for i in range(1,101):
+            remove_item.append(str(i))
+        POST_PARA={
+          "product":"UA",
+          "prev_search_mode":"AdvancedSearch",
+          "search_mode":"CombineSearches",
+          "SID":WosAdvancedQuerySpider.SID,
+          "action":"remove",
+          "goToPageLoc":"SearchHistoryTableBanner",
+          "currUrl":"http://apps.webofknowledge.com/UA_AdvancedSearch_input.do?product=UA&search_mode=AdvancedSearch&errorQid=77&replaceSetId=&goToPageLoc=SearchHistoryTableBanner&SID=%s" % WosAdvancedQuerySpider.SID,
+          "dSet":remove_item
+        }
+
+
+
+
+        req = requests.post(url=POST_URL,
+                            params =  POST_PARA,
+                            headers=WosAdvancedQuerySpider.HEADER)
+
+
+        status_code = req.status_code
+        if status_code != 200:
+            ## error handler
+            logging.warn(
+                str(threading.get_ident()) + "  post request to clean status_code is not 200, code is " + str(status_code))
+            return
+        html = ""
+        html = req.text
+
 
 
     def taskHandler(self):
@@ -287,7 +309,28 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
 
                 time.sleep(randint(100,300)  * 0.001)
 
+                if self.stop_world:
+                    self.stop_cnt.inc(1)
 
+                while self.stop_world:
+                    logging.info(
+                        str(threading.get_ident()) + " too many search records, current worker is hacked")
+                    time.sleep(randint(400, 500) * 0.001)
+
+                if self.cur_paperlist_num.value() >= WosAdvancedQuerySpider.THRESHOLD:
+                    logging.info( str(threading.get_ident()) +" too many search records, stop all threads until clean is done")
+                    self.stop_world = True
+                    while self.stop_cnt.value() < self.WORKER_NUM:
+                        logging.info(
+                            str(threading.get_ident()) + "wait for all threads to stop, cur is " + self.stop_cnt.value())
+                        time.sleep(randint(100, 300) * 0.001)
+
+                    self.sendPostToCleanHistory()
+                    self.stop_world = False
+                    self.stop_cnt = AtomicInteger(0)
+                    time.sleep(3000 * 0.001)
+                    logging.info(
+                        str(threading.get_ident()) + "clean is fine, restore all threads to work")
 
                 task = self.pending_task.get(timeout=1)
 
@@ -295,7 +338,6 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
                     continue
 
                 topic = task.topic
-                idx = task.idx
                 isWeak = task.isWeak
                 logging.info(str(threading.get_ident()) +" current topic is " + topic)
                 res = self.parsePosthtml(self.sendPost(topic))
@@ -305,29 +347,40 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
 
                 import math
                 logging.info(str(threading.get_ident())+ " send url to get paper list, url is " + url_want)
+                self.cur_paperlist_num.inc()
 
+                self.upateMetric(1, min(5, href_count), isWeak )
+                paper_urls = []
+                paper_urls = self.getPaperList(url_want, 5)
+                self.storePapers(task.bioName, paper_urls, isWeak)
 
-                self.upateMetric(1, min(5, href_count),isWeak )
-                records = ""
-                records = self.getPaperList(url_want, 5)
-                self.storePapers(idx, task.bioName, records, isWeak)
-
+            except queue.Empty:
+                pass
+            except ConnectionResetError as e:
+                logging.error(e)
+                pass
             except Exception as e:
                 logging.error(e)
+                loc = str(e).find("Connection aborted")
+                if loc != -1:
+                    self.pending_task.put(task)
+                traceback.print_exc()
+                pass
 
-                continue
+
 
         logging.info( str(threading.get_ident()) + " is leaving ")
         self.exited.inc()
 
 
     def putTaskInCache(self):
-
-        for isWeak in [True,False]:
+        for isWeak in [False]:
+            res = self.readTopics("./topic", isWeak)
+            topics = res[1]
+            bio_names = res[0]
             idx = 0
-            topics = self.readTopics("./topic", isWeak)
             for topic in topics:
-                self.pending_task.put(self.Task(topic, isWeak, idx))
+                self.pending_task.put(self.Task(topic, isWeak, bio_names[idx]  ) )
                 idx = idx + 1
 
 
@@ -343,15 +396,23 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
         )
 
 
-
+    def initSheet(self):
+        self.book = xlwt.Workbook(encoding='utf-8')
+        self.sheet = self.book.add_sheet('spider_records', cell_overwrite_ok=True)
+        for i in range(len(WosAdvancedQuerySpider.SHEET_HEADER_NAMES)):
+            self.sheet.write(0, i, WosAdvancedQuerySpider.SHEET_HEADER_NAMES[i])
 
     def __init__(self):
-
+        self.stop_world = False
+        self.stop_cnt = AtomicInteger(0)
         self.initLog()
+        self.allocate_row = 1
+        self.allocate_lock = threading.Lock()
         self.pending_task = queue.Queue(1000)
+        self.cur_paperlist_num = AtomicInteger(0)
         logging.info("hello logging is started -------------")
-        self.book = xlwt.Workbook(encoding='utf-8')
-        self.sheet = self.book.add_sheet('date', cell_overwrite_ok=True)
+
+        self.initSheet()
         self.isRunning = True
         self.exited = AtomicInteger()
         self.postLock = threading.Lock()
@@ -370,29 +431,46 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
             self.strongMetric.keywordHit.inc()
             self.strongMetric.paperHit.inc(paper_hit)
 
-    class PaperInfo:
-        def __init__(self, title, authors, url):
-            self.title = title  ## str
-            self.authors = authors ## list of str
-            self.url = url
 
 
-    def storePapers(self, idx,bio_name , paper_records, isWeak):
 
-        self.sheet.write(idx, 0, bio_name)
-        i=1
-        for record in paper_records:
-            ##abstract = self.getPaperAbstract(record.url)
-            abstract = ""
-            store = record.title + "        " + record.authors[0] + "       " + abstract
-            self.sheet.write(idx, i, store)
-            i= i+1
+    def storePapers(self , bio_name , paper_urls, isWeak):
+
+        l_paper = len(paper_urls)
+        self.allocate_lock.acquire()
+        all_row = self.allocate_row
+        self.allocate_row  = self.allocate_row + l_paper
+        self.allocate_lock.release()
+        crow = all_row
+        for url in paper_urls:
+
+            ## return  title, authors ,abstract, pub_date, publisher
+            fileds = self.getPaperInfo(bio_name,url)
+
+            self.sheet.write(crow, 0, bio_name)
+            f_len = len(fileds)
+            if f_len == 0:
+                continue
+            fileds[0] = str(crow - all_row + 1) +" : "+ fileds[0]
+            offset = 1
 
 
-        if isWeak:
-            self.book.save(r'./weak.xls')
-        else:
-            self.book.save(r'./strong.xls')
+
+            for ccol in range(f_len):
+                field = fileds[ccol]
+                if isinstance(field, list):
+                    self.sheet.write(crow, ccol + offset, ','.join(field) )
+                else:
+                    self.sheet.write(crow, ccol + offset, field)
+            crow= crow+1
+
+            if isWeak:
+                self.book.save(r'./weak.xls')
+            else:
+                self.book.save(r'./strong.xls')
+
+
+
 
 
     def getPaperList(self, index_url, limited):
@@ -401,7 +479,7 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
         html  = self.sendGet(index_url)
 
         soup = BeautifulSoup(html, "lxml")
-        paper_records = []
+        url_list = []
         paper_tags = soup.find_all("div", {"class": "search-results-content"})
 
         cnt = 0
@@ -409,15 +487,11 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
             cnt = cnt + 1
             if cnt > limited:
                 break
-            title =  record.find("value").text
             url = record.find("a").attrs["href"] ## the first is paper ur
             url = urllib.parse.urljoin(self.HOST, url)
-            items_author = record.find_all("a",  attrs= {"alt": "Find more records by this author"})
-            authors = [item.text for item in items_author ]
-            paper_records.append(self.PaperInfo(title, authors, url))
+            url_list.append(url)
 
-
-        return paper_records
+        return url_list
 
 
 
@@ -432,8 +506,9 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
         return html
 
 
-    def getPaperAbstract(self ,paper_url):
+    def getPaperInfo(self, bio_name,paper_url):
 
+        paper_url = paper_url +"&locale=en_US"
 
         html = self.sendGet(paper_url)
 
@@ -441,14 +516,73 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
         soup = BeautifulSoup(html, "lxml")
 
         abstract = ""
-        just_one_absract = 0
-        for elem in soup(text=re.compile(r'^Abstract') ):
-            abstract = elem.parent.nextSibling
-            just_one_absract = just_one_absract + 1
-        if just_one_absract != 1:
-            logging.warn("find multiple abstract from paper page")
+        just_one = 0
+        res = soup(text=re.compile(r'^Abstract'))
+        if len(res) == 0:
+            logging.warn(str(threading.get_ident()) +" " + bio_name +" :: "  + "paper " + paper_url + ": no abstract found")
+            return []
+        for elem in res:
+            abstract_tag = elem.parent.parent.find("p", attrs={"class", "FR_field"})
+            if abstract_tag == None:
+                logging.warn(str(threading.get_ident()) +" " +bio_name +" :: "  +"paper " + paper_url + ": no abstract found")
+                return []
+            abstract = abstract_tag.text
+            just_one = just_one + 1
 
-        return abstract
+        if just_one > 1:
+            logging.warn(str(threading.get_ident())+" " +bio_name +" :: "  +"paper " + paper_url + ": find multiple abstract from paper page")
+            return []
+
+        title = ""
+        div = soup.find("div", attrs={"xmlns:ts":"http://ts.thomson.com/framework/xml/transform"})
+        if div == None:
+            logging.warn(str(threading.get_ident()) +" " +bio_name +" :: "  +"paper " + paper_url + ": no title found")
+            return []
+        title_tag  = div.find("value")
+        if title_tag == None:
+            logging.warn(str(threading.get_ident()) +" " +bio_name +" :: "  +"paper " + paper_url + ": no title found")
+            return []
+        title = title_tag.text
+
+        authors = []
+        author_tags = soup.find_all("a", attrs={"title" : "Find more records by this author" })
+        l_au = len(author_tags)
+        if l_au == 0:
+            logging.warn(str(threading.get_ident())+" " +bio_name +" :: "  +"paper " + paper_url + ": no authors found")
+            return []
+
+        for i in range(l_au):
+            authors.append(author_tags[i].text)
+
+
+        publisher = ""
+        div = soup.find("div", attrs={"class", "block-record-info block-record-info-source"})
+        if div == None:
+            logging.warn(str(threading.get_ident())+" " +bio_name +" :: "  +"paper "  + paper_url + ": no publisher found")
+            return []
+        span = div.find("span", attrs={"class", "sourceTitle"})
+        if span == None:
+            logging.warn(str(threading.get_ident())+" " +bio_name +" :: "  +"paper " + paper_url + ": no publisher found")
+            return []
+        publisher_tag = span.find("value")
+        if publisher_tag == None:
+            logging.warn(str(threading.get_ident()) +" " +bio_name +" :: "  +"paper " + paper_url + ": no publisher found")
+            return []
+        publisher = publisher_tag.text
+
+
+        pub_date = ""
+        location = div.text.find("Published")
+        if location == -1:
+            logging.warn(str(threading.get_ident()) +" " +bio_name +" :: "  +"paper " + paper_title + ": no published date found")
+            return []
+        pub_date = div.text[location + len("Published:\n"):].split("\n")[0]
+
+
+
+
+
+        return [title, authors ,abstract, pub_date, publisher]
 
 
 
