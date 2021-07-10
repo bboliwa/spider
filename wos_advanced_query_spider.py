@@ -15,6 +15,8 @@ import threading
 from random import randint
 import itertools
 import traceback
+import socket
+import socks
 """
 用wos高级检索，用TS=""检索关键字 
 
@@ -40,7 +42,7 @@ class AtomicInteger():
 class WosAdvancedQuerySpider():
     ##url = "http://apps.webofknowledge.com/Search.do?product=UA&SID=E2vkMLiOafta1P4IqfG&search_mode=GeneralSearch&prID=2b9c5e49-0594-4052-a2a2-d7f3f4be2954"
 
-    SID= "E2otS6St8wOZpdbUMN9"
+    SID= "D2BJFqWT84nLBK3lqQx"
 
     HOST = "http://apps.webofknowledge.com/"
     SEARCH_PREFIX = "TS="
@@ -50,11 +52,15 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
 """
 
     TOPIC_FILE = "./topic"
-    COOKIE = 'SHIB_FED="ChineseFederation"; SHIB_IDP="http://idp.hust.edu.cn/idp/shibboleth"; SHIB_ID="Sh_Huazhong"; _gcl_au=1.1.638956658.1625455080; _hjid=93aa5ca8-6125-4818-88f0-5b159488e325; _hjDonePolls=708078; ak_bmsc=7D15CF40E7786AA7A838847D2E2D66AF~000000000000000000000000000000~YAAQdwpM2z7F1YN6AQAADFjliwwEi9kBZKAyEhaNqXJ2r0Js7r9zOK02Y8k33ITs3R4UkMQh69qyY7MjGthTeCIB01dWWs+uuAP25GbtFnK4OLVU/FCbSDlIyJWBsBpv6CkGaSZMl5taQleYyA2/TXGJDh7+qry4dwCrColClcBjkPWfVKs0y8L6iNE5g/k0pvx1xoZNTrMpHZUTDRo7+f1yW4amBGxYNOFRUXtZ/UFpRUQgjdO4iMvUL5w/pljqOeLYfWrQKr/pp4XxAqxjS3pnPH60CWJuKGgaUAh9Erwwm6mj+NHa/Xv71x6nK52QULnYLieTjgYyIdjjTsoj+cWdTbcGm3OTuUN0J3vnnadd0ME5gBGkDd1utdegCDPjCz6SLoVtbpH/dVX9u/+Egg==; _sp_ses.630e=*; _hjAbsoluteSessionInProgress=1; SID="E2otS6St8wOZpdbUMN9"; CUSTOMER="Huazhong University of Science and Technology"; E_GROUP_NAME="Huazhong University of Science and Technology"; bm_sz=55F228B01C845879F468C6DCFE559A14~YAAQlhTGy2yg5/t5AQAAJlcojAzHHa2CUVX6U4KpFGjqxahqBKP71PEANpmZ0KPrcS1LZT+n7JOEVgobsBuXVWcRRldH2+hYFCwAmnq2jyxb0pbKOdxeOeQXTCIiClK1CtDQTVyk4nifPznMqU+264jj8tmczzYiCtencXG6/SB2BhZlJj3A/tThJQHR6y+HOsqPQmJoG9k=; dotmatics.elementalKey=SLsLWlMhrHnTjDerSrlG; _hjTLDTest=1; _abck=7C24859D970674C11810A64112158E2E~0~YAAQlhTGy3Kg5/t5AQAA8BopjAYeN9Owg1u4d+BC9iYCAorOM8E5Ch0g1Rmvw6KnoMkbTdwsQPtOR/bL1zzdnG7g6lqUFfgLfXC3ONgnC0xkTBHXeWk29x9S8MafbY9A7kzmcmBi8ZmPrEMd+6oBXzDwcPE5EZGtmK3/kBk2WbzyBxYipful42fMgnwxzSAT4KRnA/YLxiY13OUGLrMsgV6KIGm3l+Zi6GSqZpdsdyPVdS519s6taATzkRLvLqBfJnv+jw8lZi7418acvOEJ6b5zftgcyXCr5KVlcbKKcEMIn/f5EQ11zOzMw7ztVbBRiKl7QzsVaXqWTG3vDr86SqnJVjpjMDIDjicuOpM4pVnIQ10y5BAHTn+t/8MU3tpFgW2hlGt7DTdXeuRxw2xNqfi6YvJ1iqlm5JRlJohsf2g=~-1~-1~-1; _sp_id.630e=c01f36c1-106f-4374-866a-da964ba6b3c7.1625844736.1.1625849142.1625844736.01a0e151-0cb2-4090-ace3-e457ff3b4d38; JSESSIONID=3ED14358ECEB92C6E890C6842F30D445; bm_sv=CC34B22ADA326B59B2EE3132DF9302F1~ZCEI7m9q7S0zxI2KZ6Vtt4Ta+jHQtwyZkSv7XneoLzIysFORAx7UeQbnAk/I4RinjZ207V3YDCXkKtSmy5oAo0+CcKgG91a1d4/KbvnwevXWh1iyfesOuj0Zm4q0oLvUIbr3ZOkO7d1E8p8jVP3pPDhlcTs5MKiykHfwmZ4FugY=; RT="z=1&dm=webofknowledge.com&si=d2bdffb0-f500-4f80-bb7b-856089faf7b1&ss=kqwfthto&sl=r&tt=89we&bcn=//684d0d38.akstat.io/&obo=8&nu=1iq64c1es&cl=4s640&ld=4s649&r=9bjbpnzc&ul=4s64a"'
+    COOKIE = 'SHIB_FED="ChineseFederation"; SHIB_IDP="http://idp.hust.edu.cn/idp/shibboleth"; SHIB_ID="Sh_Huazhong"; _gcl_au=1.1.638956658.1625455080; _hjid=93aa5ca8-6125-4818-88f0-5b159488e325; _hjDonePolls=708078; bm_sz=618E2A9FF7A46CBA8A573FF8BEBCDB72~YAAQVVDGyylf6vt5AQAAUYqDjgzA4ltU9tLkBLcHYWknVD5pC1cpSyyOCkpxY/7ccxm9ZnZH03uRtXjq6VZYCN4gqLQDK1QBe9c3Xwg6Y/SJJGA5UjWlQq6rb3iYTY46s4+XnfgufS7eP1+oQnNg0dO2GoYu77MZxrggv6HLjZO0WhEIloTZs2VI7ZxpCOsspD/q5eZ7LL8=; SID="D2BJFqWT84nLBK3lqQx"; CUSTOMER="Huazhong University of Science and Technology"; E_GROUP_NAME="Huazhong University of Science and Technology"; dotmatics.elementalKey=SLsLWlMhrHnTjDerSrlG; _hjTLDTest=1; _abck=DE821CF3E6DB9EAB4CD96973B74925D7~0~YAAQzxTGyzq7rIN6AQAAhQmEjgYsYJ5C/kGqw/c59CCunuO2xULT6EeZnBONXT8+kPbAobKAWmeqDFt11DOZHSsEJIGi3XlHG0s2ucW6vjDdabQOK2ZB7JRyU4oxYxDcMDhPcKyU+mDuwK6hIhPCr/wK4ehm7ms6J3Z9v4mgdiTsbNJwScWoZRwjLacF0ZqXtv2ESyqiIiU867sanefMsCPSVEYmC3USmuWcD9CGI6dhoPnvgw4GyLmg/6g8xC3qohPx7uj3bI7T8Jv2Yt2KSIJSnSdpskl6YI08lfeYSEJ1cPXNWZwYvm9br9A6gKKgezIs7/jFAzTIqsie9N9o1WGQhbB9wAKibzCkAaLi5cVGitdpFcatTb9Br0aLimzmKqWKnPp9+piXI5uRA0cZoQrD8We5MAhKaL0Ay+FOk4U=~-1~-1~-1; _sp_id.630e=6df517bf-53a5-4c87-99a3-d2b4ea6cdf46.1625888655.2.1625890722.1625888662.b67fecd8-6c87-4c0c-8bd4-c2d1c74ae4be; JSESSIONID=FD4172E93B9E8A99D9ADA8A683663135; RT="z=1&dm=webofknowledge.com&si=d2bdffb0-f500-4f80-bb7b-856089faf7b1&ss=kqx9cpn0&sl=0&tt=0&bcn=//173e250e.akstat.io/&nu=1bgjb2fak&cl=46nka&ul=46nki"'
+    PRXOY_PORT = 10808
+    ENABLE_PROXY =True
+
+
     SHEET_HEADER_NAMES = ['生物名', '论文', '作者', '摘要', '出版日期', '期刊会议名称', '相关程度（1-5）']
     HEADER = {
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-        "Accept-Encoding": "gzip, deflate",
+        "Accept-Encoding": "*",
         "Accept-Language": "zh-CN,zh;q=0.9",
         "Cache-Control": "max-age=0",
         "Connection": "keep-alive",
@@ -65,6 +71,8 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
     }
 
 
+
+    CLEAN_RANGE = 130
     THRESHOLD = 150
     WORKER_NUM = 5
 
@@ -161,14 +169,18 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
 
 
         logging.info(str(threading.get_ident()) + " prepare to send post request")
-        time.sleep(randint(2000, 3000) * 0.001)
+
 
 
         self.postLock.acquire()
-        req = requests.post(url = POST_URL,
-                            params = POST_PARA,
-                            headers=WosAdvancedQuerySpider.HEADER)
-        self.postLock.release()
+        time.sleep(randint(3000, 4000) * 0.001)
+        try:
+            req = requests.post(url = POST_URL,
+                                params = POST_PARA,
+                                headers=WosAdvancedQuerySpider.HEADER,
+                                timeout=10)
+        finally:
+            self.postLock.release()
 
         status_code = req.status_code
         if status_code != 200:
@@ -177,6 +189,7 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
             return
         html = ""
         html = req.text
+        self.cur_paperlist_num.inc()
         ## this response contains search history tab
         ## tab [href == http://apps.webofknowledge.com/summary.do]
         ## summary.do 即改关键词的论文list的 url
@@ -231,7 +244,7 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
                 logging.error(e)
 
 
-        while self.pending_task.empty() is False:
+        while self.pending_task.empty() is False or self.stop_world == True:
             logging.info("in main, the current queue status : size = " + str( self.pending_task.qsize()  ) + " workers num : " +str( threading.active_count())  )
             time.sleep(7)
 
@@ -269,7 +282,7 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
     def sendPostToCleanHistory(self):
         POST_URL = "http://apps.webofknowledge.com/UA_CombineSearches.do"
         remove_item = []
-        for i in range(1,101):
+        for i in range(1,WosAdvancedQuerySpider.CLEAN_RANGE+1):
             remove_item.append(str(i))
         POST_PARA={
           "product":"UA",
@@ -287,7 +300,7 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
 
         req = requests.post(url=POST_URL,
                             params =  POST_PARA,
-                            headers=WosAdvancedQuerySpider.HEADER)
+                            headers=WosAdvancedQuerySpider.HEADER, timeout=5)
 
 
         status_code = req.status_code
@@ -303,7 +316,7 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
 
     def taskHandler(self):
 
-        logging.info(str(threading.get_ident()) + " is working ")
+
         while self.isRunning:
             try:
 
@@ -315,22 +328,30 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
                 while self.stop_world:
                     logging.info(
                         str(threading.get_ident()) + " too many search records, current worker is hacked")
-                    time.sleep(randint(400, 500) * 0.001)
+                    time.sleep(randint(4000, 5000) * 0.001)
+
+
+                logging.info(str(threading.get_ident()) + " is working, has search " + str(self.cur_paperlist_num.value()) + " topics")
+
 
                 if self.cur_paperlist_num.value() >= WosAdvancedQuerySpider.THRESHOLD:
                     logging.info( str(threading.get_ident()) +" too many search records, stop all threads until clean is done")
                     self.stop_world = True
-                    while self.stop_cnt.value() < self.WORKER_NUM:
+                    while self.stop_cnt.value() < self.WORKER_NUM - 1:
                         logging.info(
-                            str(threading.get_ident()) + "wait for all threads to stop, cur is " + self.stop_cnt.value())
-                        time.sleep(randint(100, 300) * 0.001)
+                            str(threading.get_ident()) + "wait for all threads to stop, cur is " + str(self.stop_cnt.value() ) )
+                        time.sleep(2500 * 0.001)
 
+                    logging.info(
+                        str(threading.get_ident()) + "all threads has stopped, send post to clean search history")
                     self.sendPostToCleanHistory()
                     self.stop_world = False
                     self.stop_cnt = AtomicInteger(0)
-                    time.sleep(3000 * 0.001)
+                    self.cur_paperlist_num = AtomicInteger(self.cur_paperlist_num.value() - WosAdvancedQuerySpider.CLEAN_RANGE )
                     logging.info(
                         str(threading.get_ident()) + "clean is fine, restore all threads to work")
+                    time.sleep(3000 * 0.001)
+
 
                 task = self.pending_task.get(timeout=1)
 
@@ -342,12 +363,13 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
                 logging.info(str(threading.get_ident()) +" current topic is " + topic)
                 res = self.parsePosthtml(self.sendPost(topic))
                 href_count, url_want = res[0], res[1]
+
+
                 if href_count == 0:
                     continue
 
                 import math
                 logging.info(str(threading.get_ident())+ " send url to get paper list, url is " + url_want)
-                self.cur_paperlist_num.inc()
 
                 self.upateMetric(1, min(5, href_count), isWeak )
                 paper_urls = []
@@ -356,15 +378,23 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
 
             except queue.Empty:
                 pass
-            except ConnectionResetError as e:
-                logging.error(e)
-                pass
             except Exception as e:
+                logging.error(str(threading.get_ident()) +"::")
                 logging.error(e)
                 loc = str(e).find("Connection aborted")
+                not_trace = False
                 if loc != -1:
+                    logging.info(str(threading.get_ident()) +" "+" exception occurs, put the task back, task: "+ task.topic )
                     self.pending_task.put(task)
-                traceback.print_exc()
+                    not_trace = True
+                loc = str(e).find("Read timed out")
+                if loc != -1:
+                    logging.info(
+                        str(threading.get_ident()) + " " + " exception occurs, put the task back, task: " + task.topic)
+                    self.pending_task.put(task)
+                    not_trace = True
+                if not_trace == False:
+                    traceback.print_exc(limit=1)
                 pass
 
 
@@ -402,7 +432,15 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
         for i in range(len(WosAdvancedQuerySpider.SHEET_HEADER_NAMES)):
             self.sheet.write(0, i, WosAdvancedQuerySpider.SHEET_HEADER_NAMES[i])
 
+    def initProxy(self):
+        socks.set_default_proxy(socks.SOCKS5, "127.0.0.1", WosAdvancedQuerySpider.PRXOY_PORT)
+        socket.socket = socks.socksocket
+
+
     def __init__(self):
+        if WosAdvancedQuerySpider.ENABLE_PROXY:
+            self.initProxy()
+
         self.stop_world = False
         self.stop_cnt = AtomicInteger(0)
         self.initLog()
@@ -444,12 +482,24 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
         crow = all_row
         for url in paper_urls:
 
-            ## return  title, authors ,abstract, pub_date, publisher
-            fileds = self.getPaperInfo(bio_name,url)
-
             self.sheet.write(crow, 0, bio_name)
+            if isWeak:
+                self.book.save(r'./weak.xls')
+            else:
+                self.book.save(r'./strong.xls')
+            try:
+            ## return  title, authors ,abstract, pub_date, publisher
+                fileds = self.getPaperInfo(bio_name,url)
+            except Exception as e:
+                crow = crow + 1
+                logging.error(str(threading.get_ident()) + "::")
+                logging.error(e)
+                traceback.print_exc()
+                continue
+
             f_len = len(fileds)
             if f_len == 0:
+                crow = crow + 1
                 continue
             fileds[0] = str(crow - all_row + 1) +" : "+ fileds[0]
             offset = 1
@@ -468,9 +518,6 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
                 self.book.save(r'./weak.xls')
             else:
                 self.book.save(r'./strong.xls')
-
-
-
 
 
     def getPaperList(self, index_url, limited):
@@ -497,11 +544,12 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
 
 
     def sendGet(self, get_url):
-        req = requests.get(get_url, headers=self.HEADER)
+        time.sleep(randint(1200, 2000) * 0.001)
+        req = requests.get(get_url, headers=self.HEADER, timeout=3)
 
         status_code = req.status_code
         if status_code != 200:
-            logging.warn(threading.get_ident() + " get request status_code is not 200, url is " + get_url)
+            logging.warn(str(threading.get_ident() )+" "+ " get request status_code is not 200, url is " + get_url)
         html = req.text
         return html
 
@@ -574,7 +622,7 @@ AND (*drone* OR kilobot OR self-organizing OR “task allocation” OR decentral
         pub_date = ""
         location = div.text.find("Published")
         if location == -1:
-            logging.warn(str(threading.get_ident()) +" " +bio_name +" :: "  +"paper " + paper_title + ": no published date found")
+            logging.warn(str(threading.get_ident()) +" " +bio_name +" :: "  +"paper " + paper_url + ": no published date found")
             return []
         pub_date = div.text[location + len("Published:\n"):].split("\n")[0]
 
